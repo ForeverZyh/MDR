@@ -8,7 +8,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import  LinearSVC
 from sklearn.metrics import accuracy_score
 import tensorflow as tf
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from tensorflow.keras.layers import Dense, BatchNormalization, Activation, Input, Dropout
 from tensorflow.keras.models import Model
 import pandas as pd
@@ -25,7 +25,7 @@ class haltCallback(tf.keras.callbacks.Callback):
 class Deep_NN(object):
     def __init__(self, n_features):
         self.n_features = n_features
-        self.normal = StandardScaler()
+        self.normal = MinMaxScaler(clip=True)
         self.model = self.build_model()
         self.trainingStopCallback = haltCallback()
 
@@ -38,7 +38,7 @@ class Deep_NN(object):
 
     def fit(self, X, y):
         self.normal.fit(X)
-        self.model.fit(self.normal.transform(X), y, batch_size=512, epochs=50, callbacks=[self.trainingStopCallback])
+        self.model.fit(self.normal.transform(X), y, batch_size=512, epochs=10, callbacks=[self.trainingStopCallback])
 
     def predict(self, X):
         return self.model.predict(self.normal.transform(X), batch_size=512)
@@ -47,13 +47,13 @@ class Deep_NN(object):
         model = None
         # with tf.device('/cpu:0'):
         input1 = Input(shape=(self.n_features,))
-        dense1 = Dense(128, activation='relu')(input1)
+        dense1 = Dense(2000, activation='relu')(input1)
         norm1 = BatchNormalization()(dense1)
         drop1 = Dropout(0.5)(norm1)
-        dense2 = Dense(64, activation='relu')(drop1)
+        dense2 = Dense(1000, activation='relu')(drop1)
         norm2 = BatchNormalization()(dense2)
         drop2 = Dropout(0.5)(norm2)
-        dense3 = Dense(32, activation='relu')(drop2)
+        dense3 = Dense(100, activation='relu')(drop2)
         norm3 = BatchNormalization()(dense3)
         drop3 = Dropout(0.5)(norm3)
         dense4 = Dense(1)(drop3)
@@ -62,8 +62,8 @@ class Deep_NN(object):
         return model
 
     def explain(self, X_back, X_exp, n_samples=100):
-        # self.exp = shap.GradientExplainer(self.model, self.normal.transform(X_back))
-        self.exp = shap.DeepExplainer(self.model, self.normal.transform(X_back))
+        self.exp = shap.GradientExplainer(self.model, self.normal.transform(X_back))
+        # self.exp = shap.DeepExplainer(self.model, self.normal.transform(X_back))
         # return self.exp.shap_values(self.normal.transform(X_exp), nsamples=n_samples)
         return self.exp.shap_values(self.normal.transform(X_exp))
 

@@ -1,5 +1,7 @@
 def search_config(dataset,wm_size,p_r,tactic,model):
     if dataset == 'ember':
+        if wm_size == 3 and p_r == 0.001:
+            return {'threshold':5}
         if wm_size == 0:
             return {'threshold':10}
         elif wm_size == 8:
