@@ -267,16 +267,17 @@ class Defense_3:
             Evaluation after retraining a new model without detected poison samples.
             And calculate backdoor malware detection acc and ori test set detection acc to compare with base_line. 
         """
-        eva_model = model_utils.train_model(model_id='DNN', x_train=X, y_train=y)
-        if self.wm_size != 0:
-            y_pred = eva_model.predict(self.X_test)
-            y_analysis = [1 if i > 0.5 else 0 for i in y_pred]
-            acc = accuracy_score(y_analysis[:100000], self.y_test[:100000])
-            print(f'       [*] Acc(Fa,Xb) : {round(acc * 100, 2)}%')
-            acc1 = accuracy_score(y_analysis[100000:200000], self.y_test[100000:200000])
-            print(f'       [*] Acc(Fa,X0) : {round(acc1 * 100, 2)}%')
-            acc2 = accuracy_score(y_analysis[200000:], self.y_test[200000:])
-            print(f'       [*] Acc(Fa,X1) : {round(acc2 * 100, 2)}%')
+        for _ in range(4):
+            eva_model = model_utils.train_model(model_id='DNN', x_train=X, y_train=y)
+            if self.wm_size != 0:
+                y_pred = eva_model.predict(self.X_test)
+                y_analysis = [1 if i > 0.5 else 0 for i in y_pred]
+                acc = accuracy_score(y_analysis[:100000], self.y_test[:100000])
+                print(f'       [*] Acc(Fa,Xb) : {round(acc * 100, 2)}%')
+                acc1 = accuracy_score(y_analysis[100000:200000], self.y_test[100000:200000])
+                print(f'       [*] Acc(Fa,X0) : {round(acc1 * 100, 2)}%')
+                acc2 = accuracy_score(y_analysis[200000:], self.y_test[200000:])
+                print(f'       [*] Acc(Fa,X1) : {round(acc2 * 100, 2)}%')
         # y_ori_pred = [1 if i > 0.5 else 0 for i in eva_model.predict(self.x_mw_poisoning_candidates)]
         # acc1 = accuracy_score([1] * len(y_ori_pred), y_ori_pred)
         # print(f'       [*] Acc(Fa,Xt) : {round(acc1 * 100, 2)}%')
