@@ -11,6 +11,7 @@ import tensorflow as tf
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from tensorflow.keras.layers import Dense, BatchNormalization, Activation, Input, Dropout
 from tensorflow.keras.models import Model
+from tensorflow.keras.optimizers.legacy import SGD
 import pandas as pd
 import shap
 import os
@@ -32,7 +33,7 @@ class Deep_NN(object):
         lr = 0.1
         momentum = 0.9
         decay = 0.000001
-        opt = tf.keras.optimizers.SGD(lr=lr, momentum=momentum, decay=decay)
+        opt = SGD(lr=lr, momentum=momentum, decay=decay)
 
         self.model.compile(loss='binary_crossentropy', optimizer=opt, metrics=['accuracy'])
 
